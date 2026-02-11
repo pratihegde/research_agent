@@ -21,13 +21,6 @@ class StreamingService:
     ) -> AsyncGenerator[str, None]:
         """
         Execute research workflow and stream progress updates.
-        
-        Args:
-            query: User's research question
-            thread_id: Conversation thread identifier
-            
-        Yields:
-            SSE-formatted event strings
         """
         try:
             # Send thread_id event
@@ -48,38 +41,51 @@ class StreamingService:
                 "sources_analyzed": 0
             }
             
-            # Get the research graph
             graph = get_research_graph()
+            final_state = initial_state
             
-            # Execute workflow with streaming
-            final_state = None
+            # Use astream to monitor progress
+            async for event_data in graph.astream(initial_state, stream_mode="updates"):
+                # event_data is a dict where key is node name and value is the output of that node
+                for node_name, output in event_data.items():
+                    # Update internal state tracker
+                    final_state.update(output)
+                    
+                    if node_name == "plan":
+                        sub_count = len(output.get("plan").sub_questions) if output.get("plan") else 0
+                        yield self._format_sse_event("planning", {
+                            "status": f"Generated research plan with {sub_count} focus areas.",
+                            "sub_question_count": sub_count
+                        })
+                    
+                    elif node_name == "research":
+                        yield self._format_sse_event("research_progress", {
+                            "status": "Research completed for all sub-questions.",
+                            "sources_analyzed": output.get("sources_analyzed", 0)
+                        })
+                    
+                    elif node_name == "write_report":
+                        yield self._format_sse_event("writing", {"status": "Synthesis complete. Streaming final report..."})
             
-            # Run planning phase
-            yield self._format_sse_event("planning", {"status": "Analyzing query and creating research plan..."})
-            await asyncio.sleep(0.1)  # Allow event to be sent
-            
-            # Execute the graph (synchronous execution in thread pool)
-            loop = asyncio.get_event_loop()
-            final_state = await loop.run_in_executor(
-                None,
-                lambda: self._execute_with_callbacks(graph, initial_state)
-            )
-            
-            # Stream final response
+            # Stream final response parts
             response = self._build_response(final_state, thread_id)
             
-            # Stream report in chunks
-            yield self._format_sse_event("writing", {"status": "Generating final report..."})
-            await asyncio.sleep(0.1)
-            
-            # Stream report content in chunks (simulate streaming)
+            # Stream report content in chunks for effect
             report_chunks = self._chunk_text(response.report, chunk_size=500)
             for chunk in report_chunks:
                 yield self._format_sse_event("message", {"content": chunk})
-                await asyncio.sleep(0.05)  # Small delay for streaming effect
+                await asyncio.sleep(0.05)
             
-            # Send final done event with complete response
+            # Send final done event
             yield self._format_sse_event("done", response.model_dump())
+            
+        except Exception as e:
+            error_data = {
+                "error": str(e),
+                "detail": "Research workflow failed",
+                "thread_id": thread_id
+            }
+            yield self._format_sse_event("error", error_data)
             
         except Exception as e:
             error_data = {

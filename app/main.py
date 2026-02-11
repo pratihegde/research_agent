@@ -4,7 +4,9 @@ FastAPI application for the Multi-Agent Deep Research System
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
+from pathlib import Path
 from app.models import ChatRequest, ErrorResponse
 from app.services.streaming import get_streaming_service
 from app.services.threads import get_thread_manager
@@ -17,28 +19,21 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # In production, specify actual origins
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Mount static files correctly
+static_dir = Path(__file__).parent.parent / "static"
+if not static_dir.exists():
+    static_dir.mkdir(parents=True, exist_ok=True)
 
+# Mount the entire static directory under /static
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
-@app.get("/")
+from fastapi.responses import FileResponse
+
+@app.get("/", response_class=FileResponse)
 async def root():
-    """Root endpoint with API information"""
-    return {
-        "name": "Deep Research System",
-        "version": "1.0.0",
-        "description": "Multi-Agent LangGraph Research System",
-        "endpoints": {
-            "chat": "POST /chat - Execute research with SSE streaming",
-            "health": "GET /health - Health check"
-        }
-    }
+    """Serve the research system web UI"""
+    index_path = static_dir / "index.html"
+    return FileResponse(index_path)
 
 
 @app.get("/health")

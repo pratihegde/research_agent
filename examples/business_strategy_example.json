@@ -1,0 +1,27 @@
+{
+  "thread_id": "b8a1c9e2-45d3-4a1b-9e2c-8f4a3d2e1b0c",
+  "query": "Should company X expand into Southeast Asian markets in 2026? Consider regulatory risks, key competitors, and infrastructure requirements.",
+  "executive_summary": "Expansion into Southeast Asian (SEA) markets in 2026 presents a high-growth opportunity tempered by significant regulatory fragmentation and infrastructure gaps. While Vietnam and Indonesia offer robust digital economy growth, competition from regional incumbents like GoTo and Sea Group remains intense. A phased entry focusing on cloud infrastructure hubs is recommended.",
+  "report": "# Expansion Strategy: Southeast Asian Market Entry 2026\n\n## Market Overview\nThe SEA region continues to show a 15% CAGR in digital services, with Vietnam and Indonesia leading the growth. By 2026, the middle-class population is expected to reach 350 million.\n\n## Regulatory Landscape\nRegulatory risks are high due to varying data residency laws (e.g., Indonesia's GR 71) and complex licensing for fintech services. Navigating these requires local joint ventures.\n\n## Competition\nLocal giants like Shopee and Grab have deep penetration. New entrants should focus on niche B2B industrial tech rather than broad B2C retail.\n\n## Infrastructure\nLogistics infrastructure is improving but remains a hurdle in archipelagic nations like the Philippines. Cloud availability through AWS and Google Cloud hubs in Singapore and Indonesia provides a solid foundation for digital services.",
+  "key_takeaways": [
+    "Indonesia and Vietnam are the highest growth priority markets.",
+    "Data residency compliance is the primary regulatory hurdle.",
+    "Strategic partnership with local incumbents is more viable than direct competition."
+  ],
+  "limitations": "Analysis assumes stable geopolitical conditions and no major global economic downturn before 2026.",
+  "citations": [
+    {
+      "title": "Google, Temasek, Bain: e-Conomy SEA 2024",
+      "url": "https://www.google.com/reports/economy-sea-2024"
+    },
+    {
+      "title": "ASEAN Investment Report 2025",
+      "url": "https://asean.org/investment-report-2025"
+    }
+  ],
+  "metadata": {
+    "sub_question_count": 5,
+    "sources_analyzed": 18,
+    "completion_timestamp": "2026-02-11T14:30:00Z"
+  }
+}

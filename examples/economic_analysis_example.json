@@ -1,0 +1,27 @@
+{
+    "thread_id": "a2f9b8c7-1e5d-4c3b-9a8d-7e6f5d4c3b2a",
+    "query": "What are the main causes of inflation and how do central banks respond?",
+    "executive_summary": "Inflation is primarily driven by a combination of demand-pull factors, cost-push pressures (such as supply chain disruptions), and expansionary monetary policies. Central banks respond to rising inflation by increasing interest rates (monetary tightening) to reduce spending and investment, thereby cooling the economy. Secondary responses include quantitative tightening and macro-prudential regulations.",
+    "report": "# Economic Analysis: Inflation Drivers and Monetary Policy\n\n## Causes of Inflation\n1. **Demand-Pull**: Occurs when consumer demand exceeds supply.\n2. **Cost-Push**: Driven by increases in production costs, like wages or raw materials.\n3. **Monetary Expansion**: Excessive money supply growth relative to economic output.\n\n## Central Bank Response Mechanism\nThe primary tool is the Adjustment of Policy Rates. Higher rates increase borrowing costs, reducing disposable income and slowing price growth. \n\n## Case Study: Post-2022 Tightening Cycle\nFollowing the pandemic, major central banks initiated one of the fastest tightening cycles in history, successfully lowering global inflation from peaks of 9-10% to target ranges of 2-3% by 2025.",
+    "key_takeaways": [
+        "Interest rate hikes are the first line of defense against high inflation.",
+        "Supply chain resilience is becoming a key factor in cost-push control.",
+        "Central bank independence is crucial for maintaining price stability expectations."
+    ],
+    "limitations": "Analysis focuses on major developed economies (US FED, ECB) and may not fully apply to hyper-inflationary emerging markets.",
+    "citations": [
+        {
+            "title": "IMF World Economic Outlook Oct 2025",
+            "url": "https://www.imf.org/en/Publications/WEO"
+        },
+        {
+            "title": "Federal Reserve Monetary Policy Report 2025",
+            "url": "https://www.federalreserve.gov/monetarypolicy/2025-02-mpr-summary.htm"
+        }
+    ],
+    "metadata": {
+        "sub_question_count": 4,
+        "sources_analyzed": 15,
+        "completion_timestamp": "2026-02-11T13:45:00Z"
+    }
+}
