@@ -80,14 +80,8 @@ class StreamingService:
             yield self._format_sse_event("done", response.model_dump())
             
         except Exception as e:
-            error_data = {
-                "error": str(e),
-                "detail": "Research workflow failed",
-                "thread_id": thread_id
-            }
-            yield self._format_sse_event("error", error_data)
-            
-        except Exception as e:
+            import traceback
+            print(f"❌ Stream error: {traceback.format_exc()}")
             error_data = {
                 "error": str(e),
                 "detail": "Research workflow failed",

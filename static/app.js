@@ -111,11 +111,16 @@ class ResearchApp {
                 body: JSON.stringify({ message: query, thread_id: this.currentThreadId })
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
 
             let aiMessage = null;
             let reportData = '';
+            let currentEvent = null;
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -126,33 +131,43 @@ class ResearchApp {
 
                 for (const line of lines) {
                     if (line.startsWith('event:')) {
-                        const event = line.replace('event: ', '').trim();
-                        this.handleEvent(event);
+                        currentEvent = line.replace('event: ', '').trim();
+                        this.handleEvent(currentEvent);
                     } else if (line.startsWith('data:')) {
-                        const data = JSON.parse(line.replace('data: ', '').trim());
+                        const dataStr = line.replace('data: ', '').trim();
+                        if (!dataStr) continue;
 
-                        if (data.thread_id) {
-                            this.currentThreadId = data.thread_id;
-                            this.elements.threadId.textContent = data.thread_id.split('-')[0];
-                            this.elements.threadInfo.style.display = 'block';
-                        }
+                        try {
+                            const data = JSON.parse(dataStr);
 
-                        if (data.content) {
-                            if (!aiMessage) aiMessage = this.addMessage('', 'assistant');
-                            reportData += data.content;
-                            aiMessage.querySelector('.msg-content').innerHTML = this.markdownToHtml(reportData);
-                            this.scrollToBottom();
-                        }
-
-                        if (event === 'done') {
-                            this.renderFinalReport(data, aiMessage);
+                            if (currentEvent === 'thread_id' && data.thread_id) {
+                                this.currentThreadId = data.thread_id;
+                                this.elements.threadId.textContent = data.thread_id.split('-')[0];
+                                this.elements.threadInfo.style.display = 'block';
+                            }
+                            else if (currentEvent === 'message' && data.content) {
+                                if (!aiMessage) aiMessage = this.addMessage('', 'assistant');
+                                reportData += data.content;
+                                aiMessage.querySelector('.msg-content').innerHTML = this.markdownToHtml(reportData);
+                                this.scrollToBottom();
+                            }
+                            else if (currentEvent === 'done') {
+                                this.renderFinalReport(data, aiMessage);
+                            }
+                            else if (currentEvent === 'error') {
+                                this.removeStatus();
+                                this.addMessage(`❌ ${data.error || 'An error occurred'}`, 'assistant');
+                                console.error('Research error:', data);
+                            }
+                        } catch (e) {
+                            console.error('Failed to parse SSE data:', e);
                         }
                     }
                 }
             }
         } catch (err) {
             console.error(err);
-            this.addMessage('Connection lost. Please try again.', 'assistant');
+            this.addMessage(`Connection lost: ${err.message}. Please try again.`, 'assistant');
         } finally {
             this.setProcessing(false);
             this.removeStatus();
@@ -161,8 +176,8 @@ class ResearchApp {
 
     handleEvent(event) {
         if (event === 'planning') this.addStatus('Strategizing...');
-        if (event === 'research_progress') this.addStatus('Researching Sources...');
-        if (event === 'writing') {
+        else if (event === 'research_progress') this.addStatus('Researching Sources...');
+        else if (event === 'writing') {
             this.addStatus('Synthesizing Report...');
             this.scrollToBottom();
         }

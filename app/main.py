@@ -3,7 +3,7 @@ FastAPI application for the Multi-Agent Deep Research System
 """
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from sse_starlette.sse import EventSourceResponse
 from pathlib import Path
@@ -19,6 +19,15 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify actual origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Mount static files correctly
 static_dir = Path(__file__).parent.parent / "static"
 if not static_dir.exists():
@@ -27,7 +36,6 @@ if not static_dir.exists():
 # Mount the entire static directory under /static
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
-from fastapi.responses import FileResponse
 
 @app.get("/", response_class=FileResponse)
 async def root():
@@ -102,7 +110,8 @@ async def chat(request: ChatRequest):
             headers={
                 "Cache-Control": "no-cache",
                 "Connection": "keep-alive",
-                "X-Accel-Buffering": "no"  # Disable buffering for nginx
+                "X-Accel-Buffering": "no",
+                "Access-Control-Allow-Origin": "*",
             }
         )
         
